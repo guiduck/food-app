@@ -26,10 +26,11 @@ function getBaseUrl() {
     }
 
     if (process.env.VERCEL_URL) {
-      if (process.env.VERCEL_URL.includes("food-app-six-snowy.vercel.app")) {
+      if (process.env.VERCEL_URL.includes(process.env.PRODUCTION_URL!)) {
         return `https://${process.env.VERCEL_URL}`;
       }
-      return "https://food-app-six-snowy.vercel.app";
+
+      return `https://${process.env.PRODUCTION_URL}`;
     }
   }
 
