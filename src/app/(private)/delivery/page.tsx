@@ -1,5 +1,3 @@
-"use client";
-
 export default function DeliveryPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-l">
@@ -40,18 +38,18 @@ export default function DeliveryPage() {
         </div>
 
         <div className="space-y-s">
-          <button
-            onClick={() => (window.location.href = "/lojas")}
+          <a
+            href="/lojas"
             className="w-full bg-primary text-white py-m px-l rounded-s text-s font-medium hover:bg-primary-dark transition-colors"
           >
             Fazer Novo Pedido
-          </button>
-          <button
-            onClick={() => (window.location.href = "/")}
+          </a>
+          <a
+            href="/"
             className="w-full bg-neutral-100 text-text-primary py-m px-l rounded-s text-s font-medium hover:bg-neutral-200 transition-colors"
           >
             Voltar ao Início
-          </button>
+          </a>
         </div>
       </div>
     </div>

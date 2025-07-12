@@ -1,6 +1,5 @@
 import { Header } from "@/components/Header";
 import { getLocationFromCookies } from "@/actions/location";
-import TicketFooter from "@/components/TicketFooter";
 
 export default async function PrivateLayout({
   children,

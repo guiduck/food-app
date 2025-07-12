@@ -1,5 +1,9 @@
+import dynamic from "next/dynamic";
 import { LocationForm } from "./ui/form-location";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+
+const ThemeToggle = dynamic(() => import("@/components/ui/theme-toggle"), {
+  ssr: true,
+});
 
 export default function LocationPage() {
   return (
