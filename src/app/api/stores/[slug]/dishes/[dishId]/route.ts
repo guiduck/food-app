@@ -43,10 +43,10 @@ const fallbackDish: Dish = {
 
 export async function GET(
   _: Request,
-  { params }: { params: { slug: string; dishId: string } }
+  { params }: { params: Promise<{ slug: string; dishId: string }> }
 ): Promise<NextResponse<{ dish: Dish } | { error: string }>> {
   try {
-    const { slug, dishId } = params;
+    const { slug, dishId } = await params;
     const dishIdNumber = parseInt(dishId);
     await new Promise((resolve) => setTimeout(resolve, 800));
 
