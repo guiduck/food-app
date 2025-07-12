@@ -4,6 +4,9 @@ import StoreHeader from "./ui/store-header";
 import MenuList from "./ui/menu-list";
 import ClosedStoreOverlay from "./ui/closed-store-overlay";
 
+// Force dynamic rendering - API calls happen at request time, not build time
+export const dynamic = "force-dynamic";
+
 interface StorePageProps {
   params: Promise<{
     storeSlug: string;

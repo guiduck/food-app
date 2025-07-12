@@ -3,6 +3,8 @@ import { getDishDetails } from "@/services/dishes/dish-details";
 import DishHeader from "./ui/dish-header";
 import TicketForm from "./ui/ticket-form";
 
+export const dynamic = "force-dynamic";
+
 interface TicketPageProps {
   params: Promise<{
     storeSlug: string;
