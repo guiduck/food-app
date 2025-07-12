@@ -22,13 +22,30 @@ function getBaseUrl() {
   }
 
   // Server-side: construct absolute URL
-  // Priority order: VERCEL_URL -> NEXT_PUBLIC_SITE_URL -> localhost
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+  // Priority order: Production domain -> VERCEL_URL -> localhost
+
+  // For production, use the actual production domain
+  if (process.env.NODE_ENV === "production") {
+    // Use the production domain if available
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      return process.env.NEXT_PUBLIC_SITE_URL;
+    }
+
+    // For Vercel, use the production domain instead of VERCEL_URL
+    // VERCEL_URL can be a deployment-specific URL, not the production domain
+    if (process.env.VERCEL_URL) {
+      // Check if it's the production domain we want
+      if (process.env.VERCEL_URL.includes("food-app-six-snowy.vercel.app")) {
+        return `https://${process.env.VERCEL_URL}`;
+      }
+      // Otherwise, use the known production domain
+      return "https://food-app-six-snowy.vercel.app";
+    }
   }
 
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
+  // Development: use VERCEL_URL if available, otherwise localhost
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
   }
 
   // Development fallback
