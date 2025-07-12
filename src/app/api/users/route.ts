@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createUser } from "@/services/auth/register";
 
 const users: any[] = [];
 
@@ -7,22 +6,44 @@ export async function POST(request: Request) {
   try {
     const { email, password, role } = await request.json();
 
-    const registrationResult = await createUser(email, password, role);
-
-    if (!registrationResult.success) {
-      const status = registrationResult.message?.includes("já existe")
-        ? 409
-        : 400;
+    if (!email || !password || !role) {
       return NextResponse.json(
-        { message: registrationResult.message },
-        { status }
+        { message: "Email, senha e tipo de usuário são obrigatórios." },
+        { status: 400 }
       );
     }
+
+    if (!["store", "customer"].includes(role)) {
+      return NextResponse.json(
+        { message: "Tipo de usuário inválido." },
+        { status: 400 }
+      );
+    }
+
+    const existingUser = users.find((user) => user.email === email);
+    if (existingUser) {
+      return NextResponse.json(
+        { message: "Usuário já existe com este email." },
+        { status: 409 }
+      );
+    }
+
+    const newUser = {
+      id: users.length + 1,
+      email,
+      password,
+      role: role as "store" | "customer",
+      createdAt: new Date().toISOString(),
+    };
+
+    users.push(newUser);
+
+    const { password: _, ...userWithoutPassword } = newUser;
 
     return NextResponse.json(
       {
         message: "Usuário criado com sucesso!",
-        user: registrationResult.user,
+        user: userWithoutPassword,
       },
       { status: 201 }
     );

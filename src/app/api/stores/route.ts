@@ -93,6 +93,7 @@ export async function GET(_: NextRequest) {
       stores: mockStores,
     });
   } catch (error) {
+    console.error("Stores API error:", error);
     return NextResponse.json(
       { message: "Erro interno do servidor" },
       { status: 500 }

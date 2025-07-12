@@ -38,12 +38,14 @@ export default async function API<T = any>(
   const fullUrl = `${baseUrl}/api/${request.url}`;
 
   if (process.env.NODE_ENV === "production") {
-    console.log("API Debug:", {
+    console.log("API Request Debug:", {
       baseUrl,
       fullUrl,
       vercelUrl: process.env.VERCEL_URL,
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
       isClient: typeof window !== "undefined",
+      requestUrl: request.url,
+      method: request.method,
     });
   }
 
@@ -65,6 +67,15 @@ export default async function API<T = any>(
     const responseData = await response.json();
 
     if (!response.ok) {
+      if (process.env.NODE_ENV === "production") {
+        console.error("API Response Error:", {
+          status: response.status,
+          statusText: response.statusText,
+          url: fullUrl,
+          responseData,
+        });
+      }
+
       return {
         status: response.status,
         data: null,
@@ -83,10 +94,11 @@ export default async function API<T = any>(
     };
   } catch (error) {
     if (process.env.NODE_ENV === "production") {
-      console.error("API Error:", {
+      console.error("API Fetch Error:", {
         url: fullUrl,
         error: error,
         message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
       });
     }
 
