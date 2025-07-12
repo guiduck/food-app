@@ -1,18 +1,19 @@
 import { NextResponse } from "next/server";
 import { Dish } from "@/types/store-details";
+import { mockStoreDetails } from "../../../data";
 
-const mockDish: Dish = {
-  id: 1,
-  name: "Pizza Margherita Especial",
+const fallbackDish: Dish = {
+  id: 999,
+  name: "Prato Especial da Casa",
   description:
-    "Nossa clássica pizza margherita com molho de tomate artesanal, mussarela de búfala, manjericão fresco e azeite extra virgem.",
-  price: 28.9,
-  originalPrice: 35.9,
-  image: "/images/dishes/pizza-margherita.jpg",
+    "Um delicioso prato preparado com ingredientes frescos e selecionados. Perfeito para qualquer ocasião!",
+  price: 25.9,
+  originalPrice: 32.9,
+  image: "/images/dishes/prato-especial.jpg",
   warning: {
     spicy: false,
     vegan: false,
-    vegetarian: true,
+    vegetarian: false,
     glutenFree: false,
   },
   available: true,
@@ -23,54 +24,52 @@ const mockDish: Dish = {
       required: true,
       type: "single",
       ingredients: [
-        { title: "Pequena", price: 22.9 },
-        { title: "Média", price: 19.9, originalPrice: 28.9 },
-        { title: "Grande", price: 32.9, originalPrice: 38.9 },
+        { title: "Individual", price: 25.9 },
+        { title: "Para Compartilhar", price: 39.9, originalPrice: 49.9 },
       ],
     },
     {
-      title: "Borda",
+      title: "Acompanhamentos",
       hasOffer: false,
       type: "single",
       ingredients: [
-        { title: "Sem borda", price: 0 },
-        { title: "Catupiry", price: 5.9 },
-        { title: "Cheddar", price: 6.9 },
-        { title: "Chocolate", price: 7.9 },
-      ],
-    },
-    {
-      title: "Adicionais",
-      hasOffer: false,
-      type: "multiple",
-      ingredients: [
-        { title: "Azeitona", price: 3.9 },
-        { title: "Palmito", price: 4.9 },
-        { title: "Bacon", price: 6.9 },
-        { title: "Champignon", price: 5.9 },
+        { title: "Arroz Branco", price: 0 },
+        { title: "Batata Frita", price: 6.9 },
+        { title: "Salada", price: 8.9 },
       ],
     },
   ],
 };
 
-export async function GET(): Promise<
-  NextResponse<{ dish: Dish } | { error: string }>
-> {
+export async function GET(
+  _: Request,
+  { params }: { params: { slug: string; dishId: string } }
+): Promise<NextResponse<{ dish: Dish } | { error: string }>> {
   try {
-    const dish = mockDish;
+    const { slug, dishId } = params;
+    const dishIdNumber = parseInt(dishId);
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
-    if (!dish) {
-      return NextResponse.json(
-        { error: "Prato não encontrado" },
-        { status: 404 }
-      );
+    const store = mockStoreDetails[slug];
+    if (!store) {
+      return NextResponse.json({ dish: fallbackDish });
     }
 
-    return NextResponse.json({ dish });
+    let foundDish: Dish | undefined;
+
+    for (const category of store.menu) {
+      foundDish = category.dishes.find((dish) => dish.id === dishIdNumber);
+      if (foundDish) {
+        break;
+      }
+    }
+
+    if (!foundDish) {
+      return NextResponse.json({ dish: fallbackDish });
+    }
+
+    return NextResponse.json({ dish: foundDish });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ dish: fallbackDish });
   }
 }

@@ -3,6 +3,7 @@ import { TicketItem } from "@/types/ticket";
 import { Dish } from "@/types/store-details";
 import { Store } from "@/types/store";
 import { saveTicketToCookies, getTicketFromCookies } from "@/lib/cookies";
+import { generateTicketId } from "./ticket-utils";
 
 interface TicketState {
   ticket: TicketItem | null;
@@ -15,11 +16,8 @@ interface TicketState {
   loadTicketFromCookies: () => void;
 }
 
-const generateTicketId = (): string =>
-  Date.now().toString() + Math.random().toString(36).substr(2, 9);
-
 const calculateTotalPrice = (dishes: Dish[]): number => {
-  return dishes.reduce((total, dish) => {
+  const total = dishes.reduce((total, dish) => {
     let dishPrice = dish.price;
 
     dish.options?.forEach((option) => {
@@ -34,18 +32,23 @@ const calculateTotalPrice = (dishes: Dish[]): number => {
 
     return total + dishPrice * (dish.quantity || 1);
   }, 0);
+
+  return total;
 };
 
 export const useTicketStore = create<TicketState>()((set, get) => ({
   ticket: null,
 
   createTicket: (dishes: Dish[], store: Store) => {
-    if (dishes.length === 0) return;
+    if (dishes.length === 0) {
+      return;
+    }
 
+    const ticketId = generateTicketId();
     const totalPrice = calculateTotalPrice(dishes);
 
     const ticket: TicketItem = {
-      id: generateTicketId(),
+      id: ticketId,
       store: {
         name: store.name,
         slug: store.slug,
@@ -60,12 +63,16 @@ export const useTicketStore = create<TicketState>()((set, get) => ({
     set({ ticket });
   },
 
-  getTicket: () => get().ticket,
+  getTicket: () => {
+    const ticket = get().ticket;
+    return ticket;
+  },
 
   clearTicket: () => set({ ticket: null }),
 
   saveTicketToCookies: () => {
     const { ticket } = get();
+
     if (!ticket) return;
 
     saveTicketToCookies(ticket);

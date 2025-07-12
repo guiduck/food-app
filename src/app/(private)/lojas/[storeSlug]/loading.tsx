@@ -10,37 +10,39 @@ export default function Loading() {
               <Skeleton className="size-9 rounded-m flex-shrink-0" />
               <Skeleton className="h-6 w-40 rounded" />
             </div>
-            <div className="flex items-start justify-between mb-xxs">
-              <div className="flex items-center gap-s">
-                <Skeleton className="h-6 w-6 rounded-full" />
-                <Skeleton className="h-6 w-6 rounded-full" />
-              </div>
-              <Skeleton className="h-6 w-20 rounded ml-auto" />
+            <div className="flex items-center gap-s mb-xxs">
+              <Skeleton className="h-6 w-6 rounded-full" />
+              <Skeleton className="h-6 w-6 rounded-full" />
             </div>
-            <Skeleton className="h-5 w-32 rounded mb-xs" />
-            <Skeleton className="h-5 w-48 rounded mb-xs" />
-            <div className="flex items-center gap-xxs">
+            <div className="flex items-center gap-xxs mb-xs">
               <Skeleton className="h-4 w-16 rounded" />
               <Skeleton className="h-4 w-4 rounded" />
               <Skeleton className="h-4 w-20 rounded" />
+              <Skeleton className="h-4 w-4 rounded" />
+              <Skeleton className="h-4 w-10 rounded" />
             </div>
           </div>
-          <Skeleton className="bg-destructive text-white px-s py-xxs rounded-s text-xs font-bold h-6 w-16" />
+
+          <Skeleton className="h-6 w-16 rounded-s" />
+        </div>
+
+        <div className="flex items-center gap-xxs">
+          <Skeleton className="h-4 w-20 rounded" />
+          <Skeleton className="h-4 w-4 rounded" />
+          <Skeleton className="h-4 w-16 rounded" />
         </div>
         <Skeleton className="h-4 w-32 rounded mt-xs" />
       </div>
+
       <div className="pb-l">
         {[...Array(2)].map((_, i) => (
           <div key={i} className="mb-m">
-            <div className="flex flex-col gap-[4px]">
-              <Skeleton className="h-6 w-32 rounded mb-xxs" />
-              <Skeleton className="h-4 w-48 rounded mb-xs" />
-            </div>
-            <div className="pl-l pr-m">
+            <div>
               {[...Array(3)].map((_, j) => (
                 <Skeleton key={j} className="h-14 w-full rounded mb-s" />
               ))}
             </div>
+
             {i !== 1 && (
               <Skeleton className="h-[2px] w-full bg-border my-[4px]" />
             )}

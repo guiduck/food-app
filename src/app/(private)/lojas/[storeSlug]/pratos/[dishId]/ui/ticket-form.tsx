@@ -27,9 +27,11 @@ export default function TicketForm({ dish }: TicketFormProps) {
   } = useDishStore();
 
   const hasFilledRequiredOptions = useMemo(() => {
-    if (!currentDish?.options || !dish.options) return false;
+    if (!dish.options || dish.options.length === 0) return true;
+    if (!currentDish?.options) return false;
 
     const requiredOptions = dish.options.filter((opt) => opt.required);
+    if (requiredOptions.length === 0) return true;
 
     return requiredOptions.every((reqOpt) => {
       const currentOption = currentDish.options!.find(

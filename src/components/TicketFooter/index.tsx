@@ -1,11 +1,8 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useTicketStore } from "@/stores/ticket-store";
+import { usePathname } from "next/navigation";
 import { useDishStore } from "@/stores/dish-store";
-import { createTicket } from "@/services/checkout";
+import { useTicketOperations } from "@/hooks/useTicketOperations";
 
 interface TicketFooterProps {
   className?: string;
@@ -18,26 +15,15 @@ interface TicketFooterProps {
 }
 
 export function TicketFooter({ className = "", store }: TicketFooterProps) {
-  const router = useRouter();
   const pathname = usePathname();
-  const [isProcessing, setIsProcessing] = useState(false);
-
   const { dishes } = useDishStore();
-  const {
-    createTicket: createTicketInStore,
-    saveTicketToCookies,
-    clearTicket,
-  } = useTicketStore();
+  const { processCheckout, isProcessing } = useTicketOperations();
 
   const isCheckout = pathname.includes("/checkout/");
   const hasDishes = dishes.length > 0;
 
-  const createTicketAndSave = async () => {
-    if (dishes.length === 0) {
-      toast.error("Adicione itens ao seu pedido");
-      return false;
-    }
-    createTicketInStore(dishes, {
+  const handleCheckout = async () => {
+    await processCheckout({
       name: store.name,
       slug: store.slug,
       image: store.image,
@@ -47,46 +33,6 @@ export function TicketFooter({ className = "", store }: TicketFooterProps) {
       closingTime: "",
       isOpen: true,
     });
-    saveTicketToCookies();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    return true;
-  };
-
-  const handleCheckout = async () => {
-    const latestTicket = useTicketStore.getState().ticket;
-    if (!latestTicket) {
-      toast.error("Nenhum ticket encontrado");
-      setIsProcessing(false);
-      return;
-    }
-    try {
-      const result = await createTicket(latestTicket);
-      if (result.error) {
-        throw new Error(result.errorUserMessage || "Erro ao criar pedido");
-      }
-      toast.success("Pedido criado com sucesso!");
-      clearTicket();
-      router.push(`/checkout/${result.data?.ticket?.id}`);
-    } catch (error) {
-      toast.error("Erro ao finalizar pedido. Tente novamente.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleCreateAndCheckout = async () => {
-    setIsProcessing(true);
-    try {
-      const created = await createTicketAndSave();
-      if (!created) {
-        setIsProcessing(false);
-        return;
-      }
-      await handleCheckout();
-    } catch {
-      setIsProcessing(false);
-      toast.error("Erro ao criar ticket");
-    }
   };
 
   if (isCheckout || !hasDishes) return null;
@@ -104,7 +50,7 @@ export function TicketFooter({ className = "", store }: TicketFooterProps) {
             </p>
           </div>
           <button
-            onClick={handleCreateAndCheckout}
+            onClick={handleCheckout}
             disabled={isProcessing}
             className={`w-full px-xl py-m rounded-s text-s font-medium transition-colors ${
               isProcessing

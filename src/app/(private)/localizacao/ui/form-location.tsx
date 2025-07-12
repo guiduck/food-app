@@ -52,7 +52,6 @@ export function LocationForm() {
 
       return components.join(", ") || data.display_name;
     } catch (error) {
-      console.error("Reverse geocoding error:", error);
       throw new Error("Não foi possível obter o endereço");
     }
   };
@@ -63,7 +62,6 @@ export function LocationForm() {
       toast.success("Localização salva com sucesso!");
       router.push("/lojas");
     } catch (error) {
-      console.error("Error saving location:", error);
       toast.error("Erro ao salvar localização");
     }
   };

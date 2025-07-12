@@ -17,16 +17,35 @@ interface DishState {
 }
 
 const areDishesEqual = (dish1: Dish, dish2: Dish): boolean => {
-  if (dish1.name !== dish2.name || dish1.notes !== dish2.notes) return false;
+  if (dish1.name !== dish2.name || dish1.notes !== dish2.notes) {
+    return false;
+  }
 
-  if (!dish1.options && !dish2.options) return true;
-  if (!dish1.options || !dish2.options) return false;
-  if (dish1.options.length !== dish2.options.length) return false;
+  // both have no options
+  if (!dish1.options && !dish2.options) {
+    return true;
+  }
+
+  // only one has options
+  if (!dish1.options || !dish2.options) {
+    return false;
+  }
+
+  // different lengths
+  if (dish1.options.length !== dish2.options.length) {
+    return false;
+  }
 
   return dish1.options.every((option1, index) => {
     const option2 = dish2.options![index];
-    if (option1.title !== option2.title) return false;
-    if (option1.ingredients.length !== option2.ingredients.length) return false;
+
+    if (option1.title !== option2.title) {
+      return false;
+    }
+
+    if (option1.ingredients.length !== option2.ingredients.length) {
+      return false;
+    }
 
     return option1.ingredients.every((ing1, ingIndex) => {
       const ing2 = option2.ingredients[ingIndex];

@@ -15,10 +15,12 @@ export default function CheckoutTicket({
   const formatOptionText = (option: any) => {
     const parts: string[] = [];
 
-    if (option.selectedValues && option.selectedValues.length > 0) {
+    // Handle selected values
+    if (option.selectedValues?.length > 0) {
       parts.push(option.selectedValues.join(", "));
     }
 
+    // Handle quantities
     if (option.quantities && Object.keys(option.quantities).length > 0) {
       Object.entries(option.quantities).forEach(([item, qty]) => {
         parts.push(`${item} (${qty}x)`);
@@ -30,7 +32,12 @@ export default function CheckoutTicket({
 
   const calculateDishPrice = (dish: Dish): number => {
     let dishPrice = dish.price;
-    dish.options?.forEach((option) => {
+
+    if (!dish.options) {
+      return dishPrice;
+    }
+
+    dish.options.forEach((option) => {
       option.ingredients.forEach((ingredient) => {
         if (option.type === "quantity") {
           dishPrice += ingredient.price * (ingredient.quantity ?? 0);
@@ -39,6 +46,7 @@ export default function CheckoutTicket({
         }
       });
     });
+
     return dishPrice;
   };
 

@@ -13,6 +13,7 @@ export default function Loading() {
             </div>
           </div>
         </div>
+
         <div className="bg-white">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="p-m border-b border-neutral-100">
@@ -30,12 +31,15 @@ export default function Loading() {
             </div>
           ))}
         </div>
-        <div className="fixed bottom-0 left-0 right-0 bg-white flex justify-between border-t items-center border-dividers py-m px-xl shadow-md max-w-md mx-auto">
-          <div className="flex flex-col gap-[2px] min-w-100 items-center justify-between">
-            <Skeleton className="h-4 w-16 rounded mb-xxs" />
-            <Skeleton className="h-6 w-24 rounded" />
+
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-dividers py-m px-xl shadow-md max-w-md mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-[2px]">
+              <Skeleton className="h-4 w-16 rounded" />
+              <Skeleton className="h-6 w-24 rounded" />
+            </div>
+            <Skeleton className="h-10 w-40 rounded-m" />
           </div>
-          <Skeleton className="h-10 w-40 rounded-m ml-m" />
         </div>
       </div>
     </div>

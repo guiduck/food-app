@@ -17,20 +17,16 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    try {
-      const locationCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("user_location="));
+    const locationCookie = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("user_location="));
 
-      if (locationCookie) {
-        const locationValue = locationCookie.split("=")[1];
-        const decodedValue = decodeURIComponent(locationValue);
-        const location = JSON.parse(decodedValue) as LocationData;
-        setUserLocation(location);
-      }
-    } catch (error) {
-      console.error("Error reading location cookie:", error);
-    }
+    if (!locationCookie) return;
+
+    const locationValue = locationCookie.split("=")[1];
+    const decodedValue = decodeURIComponent(locationValue);
+    const location = JSON.parse(decodedValue) as LocationData;
+    setUserLocation(location);
   }, []);
 
   const displayAddress =

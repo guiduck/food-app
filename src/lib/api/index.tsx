@@ -20,22 +20,22 @@ function getBaseUrl() {
     return "";
   }
 
-  if (process.env.NODE_ENV === "production") {
-    if (process.env.NEXT_PUBLIC_SITE_URL) {
-      return process.env.NEXT_PUBLIC_SITE_URL;
-    }
-
+  if (process.env.NODE_ENV !== "production") {
     if (process.env.VERCEL_URL) {
-      if (process.env.VERCEL_URL.includes(process.env.PRODUCTION_URL!)) {
-        return `https://${process.env.VERCEL_URL}`;
-      }
-
-      return `https://${process.env.PRODUCTION_URL}`;
+      return `https://${process.env.VERCEL_URL}`;
     }
+    return "http://localhost:3000";
+  }
+
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
   }
 
   if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
+    if (process.env.VERCEL_URL.includes(process.env.PRODUCTION_URL!)) {
+      return `https://${process.env.VERCEL_URL}`;
+    }
+    return `https://${process.env.PRODUCTION_URL}`;
   }
 
   return "http://localhost:3000";
@@ -49,12 +49,30 @@ export default async function API<T = any>(
 
   const isFormData = request.data instanceof FormData;
 
+  console.log(`📡 API Request: ${request.method} ${fullUrl}`);
+
+  if (request.data && !isFormData) {
+    console.log(`📤 Request data:`, request.data);
+  }
+
+  let cookieHeader = "";
+  if (typeof window === "undefined") {
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+      cookieHeader = cookieStore.toString();
+    } catch (error) {
+      console.log(`🍪 Could not access server cookies:`, error);
+    }
+  }
+
   try {
     const response = await fetch(fullUrl, {
       method: request.method,
       next: request.next,
       headers: {
         ...(isFormData ? {} : { "Content-Type": "application/json" }),
+        ...(cookieHeader ? { Cookie: cookieHeader } : {}),
         ...request.headers,
       },
       ...(request.method !== "GET" && request.data
@@ -62,48 +80,52 @@ export default async function API<T = any>(
         : {}),
     });
 
+    console.log(`📊 API Response status: ${response.status} for ${fullUrl}`);
+
     const responseData = await response.json();
 
     if (!response.ok) {
       console.error("❌ API Response Error:", {
         status: response.status,
         url: fullUrl,
+        method: request.method,
         responseData,
       });
 
       return {
-        status: response.status,
         data: null,
         error: true,
-        errorUserMessage: responseData?.message || "Erro desconhecido.",
+        errorUserMessage: responseData.message || "Erro desconhecido.",
         debug: responseData,
+        status: response.status,
+        headers: response.headers,
       };
     }
 
+    console.log(`✅ API Response success: ${request.method} ${fullUrl}`);
+
+    if (request.url.includes("tickets") && request.method === "GET") {
+      console.log(`🎫 Ticket response data:`, responseData);
+    }
+
     return {
-      status: response.status,
       data: responseData,
       error: false,
       errorUserMessage: "",
+      debug: responseData,
+      status: response.status,
       headers: response.headers,
     };
   } catch (error) {
-    console.error("💥 API Fetch Error:", {
-      url: fullUrl,
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
+    console.error(`❌ API Request failed for ${fullUrl}:`, error);
 
     return {
-      status: 500,
       data: null,
       error: true,
-      errorUserMessage: "Erro no servidor.",
+      errorUserMessage: "Erro de conexão. Tente novamente.",
+      debug: error,
+      status: 500,
       headers: null,
-      debug: {
-        error: error instanceof Error ? error.message : "Unknown error",
-        type: "FETCH_ERROR",
-        url: fullUrl,
-      },
     };
   }
 }

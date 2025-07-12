@@ -14,9 +14,11 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   try {
     const response = await getCheckoutData(ticketId);
 
-    console.log(response);
+    if (response.error) {
+      notFound();
+    }
 
-    if (response.error || !response.data?.ticket) {
+    if (!response.data?.ticket) {
       notFound();
     }
 
@@ -36,7 +38,6 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
       </div>
     );
   } catch (error) {
-    console.error("Error loading checkout data:", error);
     notFound();
   }
 }

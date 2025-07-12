@@ -1,347 +1,264 @@
-# 🍕 Food Delivery App
+# Food Delivery App
 
-A modern, full-stack food delivery application built with Next.js 15, featuring a sophisticated cart system, authentication, and a comprehensive design system.
+Um aplicativo web completo de delivery de comida, desenvolvido com Next.js 15, focado em arquitetura robusta, experiência do usuário excepcional e sistema de design escalável.
 
-## 🚀 Features
+## 🚀 Características Principais
 
-### 🛒 Advanced Cart System
+- **Autenticação Completa**: Sistema de login/registro com proteção de rotas
+- **Localização**: Usuários definem sua localização antes de navegar pelas lojas
+- **Navegação de Lojas**: Explore restaurantes e estabelecimentos por localização
+- **Catálogo de Produtos**: Navegue produtos por categoria com imagens, preços e avaliações
+- **Carrinho de Compras**: Adicione e gerencie itens no ticket (carrinho)
+- **Processo de Checkout**: Fluxo completo de pedido com confirmação
+- **Rastreamento de Entrega**: Tela de acompanhamento do pedido
+- **Persistência Local**: Dados do carrinho persistem entre sessões usando cookies
+- **Design System**: Interface moderna e responsiva com tema personalizável
 
-- **Persistent Storage**: Cart data saved in cookies for backend API access
-- **Complex Customizations**: Support for radio buttons, checkboxes, and quantity selections
-- **Automatic Price Calculation**: Real-time price updates based on selected options
-- **Multi-Restaurant Support**: Organize orders by restaurant/store
-- **Custom Notes**: Add special instructions per item
-- **Quantity Management**: Easy increment/decrement controls
+## 🛠️ Stack Tecnológica
 
-### 🔐 Authentication System
+- **Framework**: Next.js 15 (App Router)
+- **Linguagem**: TypeScript
+- **Estilização**: Tailwind CSS
+- **Componentes UI**: Radix UI
+- **Gerenciamento de Estado**: Zustand
+- **Validação**: Zod + React Hook Form
+- **Temas**: Next Themes
+- **Notificações**: Sonner
+- **Desenvolvimento**: Storybook
+- **Linting**: ESLint
 
-- **Role-Based Access**: Separate interfaces for customers and store owners
-- **Secure Sessions**: HTTP-only cookies with 24-hour expiration
-- **Form Validation**: Comprehensive validation with Zod schemas
-- **Auto-Login**: Seamless login after registration
-- **Mock API**: Realistic backend simulation with proper error handling
-
-### 🎨 Design System
-
-- **Tailwind CSS v4**: Latest version with native CSS variables
-- **shadcn/ui Integration**: Accessible components with custom styling
-- **Brazilian Portuguese**: Localized UI text throughout
-- **Responsive Design**: Mobile-first approach
-- **Design Tokens**: Consistent spacing, colors, and typography
-
-### 📱 Pages & Features
-
-- **Landing Page**: Modern hero section with features showcase
-- **Restaurant Browsing**: Browse restaurants and their menus
-- **Dish Customization**: Complex dish configuration with options
-- **Checkout Flow**: Complete order review and confirmation
-- **Location Services**: Address management for delivery
-- **Order Tracking**: Delivery status and confirmation
-
-## 🛠️ Tech Stack
-
-### Frontend
-
-- **Next.js 15** - React framework with App Router
-- **TypeScript** - Type-safe development
-- **Tailwind CSS v4** - Utility-first CSS framework
-- **shadcn/ui** - Accessible component library
-- **Zustand** - Lightweight state management
-- **React Hook Form** - Form handling with validation
-- **Zod** - Schema validation
-- **Lucide React** - Icon library
-
-### Backend
-
-- **Next.js API Routes** - Server-side API endpoints
-- **Nookies** - Cookie management
-- **Mock Database** - In-memory data storage for development
-
-### Development Tools
-
-- **Storybook** - Component development environment
-- **ESLint** - Code linting
-- **TypeScript** - Type checking
-- **Jest** - Testing framework
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- npm, yarn, pnpm, or bun
-
-### Installation
-
-1. **Clone the repository**
-
-```bash
-git clone <repository-url>
-cd food-delivery
-```
-
-2. **Install dependencies**
-
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-3. **Run the development server**
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-4. **Open your browser**
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-### Available Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run typecheck    # Run TypeScript type checking
-npm run storybook    # Start Storybook development server
-npm run build-storybook # Build Storybook for production
-```
-
-## 🧪 Testing
-
-### Demo Credentials
-
-```bash
-# Store/Restaurant Account
-Email: store@food.com
-Password: 123456
-Role: store
-
-# Customer Account
-Email: user@food.com
-Password: 123456
-Role: customer
-```
-
-### API Endpoints
-
-```bash
-# User Registration
-POST /api/users
-{
-  "email": "user@example.com",
-  "password": "123456",
-  "role": "customer" // or "store"
-}
-
-# User Login
-POST /api/auth/login
-{
-  "email": "user@example.com",
-  "password": "123456"
-}
-
-# Create Order
-POST /api/tickets
-{
-  "items": [...],
-  "totalPrice": 45.90,
-  "totalItems": 3
-}
-```
-
-## 🏗️ Architecture
-
-### Project Structure
+## 📁 Estrutura do Projeto
 
 ```
 food-delivery/
 ├── src/
-│   ├── app/
-│   │   ├── (public)/          # Public routes (login, register)
-│   │   ├── (private)/         # Protected routes (main app)
-│   │   ├── api/               # API routes
-│   │   └── globals.css        # Global styles
-│   ├── components/
-│   │   ├── ui/                # shadcn/ui components
-│   │   ├── TicketFooter/      # Cart footer component
-│   │   ├── TicketSummary/     # Cart summary component
-│   │   └── ...                # Other components
-│   ├── stores/
-│   │   ├── ticket-store.ts    # Cart state management
-│   │   └── dish-store.ts # Dish form state
-│   ├── services/              # API service layer
-│   ├── hooks/                 # Custom React hooks
-│   ├── lib/                   # Utility functions
-│   └── types/                 # TypeScript definitions
-├── public/                    # Static assets
-└── docs/                      # Documentation files
+│   ├── app/                    # Next.js App Router
+│   │   ├── (public)/          # Rotas públicas (sem autenticação)
+│   │   │   ├── landing/       # Página inicial
+│   │   │   ├── login/         # Login do usuário
+│   │   │   └── register/      # Registro de usuário
+│   │   ├── (private)/         # Rotas privadas (requer autenticação)
+│   │   │   ├── localizacao/   # Definir localização
+│   │   │   ├── lojas/         # Listagem de lojas
+│   │   │   ├── checkout/      # Processo de checkout
+│   │   │   ├── delivery/      # Acompanhamento de entrega
+│   │   │   └── design-system/ # Documentação do design system
+│   │   ├── api/               # API Routes
+│   │   │   ├── auth/          # Autenticação
+│   │   │   ├── banners/       # Banners promocionais
+│   │   │   ├── checkout/      # Processamento de pedidos
+│   │   │   ├── stores/        # Dados das lojas
+│   │   │   ├── tickets/       # Gerenciamento de tickets
+│   │   │   └── users/         # Gerenciamento de usuários
+│   │   ├── globals.css        # Estilos globais e tokens do design system
+│   │   └── layout.tsx         # Layout principal
+│   ├── components/            # Componentes reutilizáveis
+│   ├────── **/**.stories.tsx  # Storybook dos componentes
+│   │   ├── ui/                # Componentes base (Radix UI)
+│   │   ├── Banner/            # Componente de banner
+│   │   ├── DishCard/          # Card de produto/prato
+│   │   ├── Header/            # Cabeçalho da aplicação
+│   │   ├── Footer/            # Rodapé
+│   │   ├── MenuItem/          # Item de menu
+│   │   ├── SearchBar/         # Barra de pesquisa
+│   │   ├── StoreCard/         # Card de loja
+│   │   ├── TicketFooter/      # Rodapé do ticket
+│   │   └── QuantityGroup/     # Controle de quantidade
+│   ├── stores/                # Gerenciamento de estado (Zustand)
+│   │   ├── dish-store.tsx     # Estado dos pratos/produtos
+│   │   ├── ticket-store.ts    # Estado do carrinho
+│   │   └── search-store.ts    # Estado da busca
+│   ├── actions/               # Server Actions
+│   ├── services/              # Serviços e API clients
+│   ├── hooks/                 # Hooks customizados
+│   ├── lib/                   # Utilitários e configurações
+│   ├── types/                 # Definições TypeScript
+│   └── middleware.ts          # Middleware de autenticação
+├── public/                    # Assets estáticos
+│   ├── images/
+│   │   ├── banners/          # Imagens de banners
+│   │   ├── dishes/           # Imagens de pratos
+│   │   └── stores/           # Imagens de lojas
+│   └── favicon.svg
+├── .storybook/               # Configuração do Storybook
 ```
 
-### State Management
+## 🎨 Design System
 
-#### Cart System (`useTicketStore`)
+O projeto implementa um design system completo com:
 
-```typescript
-// Add item to cart
-const { addItem } = useTicketStore();
+- **Tokens de Design**: Cores, tipografia, espaçamento e border-radius definidos como CSS Custom Properties
+- **Componentes Base**: Utilizando Radix UI para acessibilidade e funcionalidade
+- **Temas**: Suporte a tema claro/escuro com Next Themes
+- **Responsividade**: Design mobile-first com breakpoints otimizados
+- **Fonte**: Nunito como fonte principal da interface
 
-addItem({
-  dishId: dish.id,
-  storeSlug: "pizzaria-bella",
-  dish: dishData,
-  quantity: 2,
-  options: selectedOptions,
-  notes: "No onions please",
-});
-
-// Get cart summary
-const { getTotalItems, getTotalPrice } = useTicketStore();
-```
-
-#### Form State (`useDishFormStore`)
-
-```typescript
-// Manage dish customization form
-const { dishQuantity, selectedOptions, setDishQuantity } = useDishFormStore();
-```
-
-### Design System Usage
-
-#### Colors
-
-```tsx
-// Brand colors
-<div className="bg-primary text-primary-foreground">
-<div className="bg-teal text-teal-text">
-<div className="bg-success text-success-foreground">
-
-// Semantic colors
-<p className="text-text-primary">Main content</p>
-<p className="text-text-secondary">Secondary content</p>
-<span className="text-icons">Icon color</span>
-```
-
-#### Spacing
-
-```tsx
-// Consistent spacing scale
-<div className="p-s m-s gap-s">      // 12px
-<div className="p-m m-m gap-m">      // 16px
-<div className="p-l m-l gap-l">      // 24px
-```
-
-#### Typography
-
-```tsx
-// Typography scale
-<h1 className="text-xl font-bold">   // 24px
-<h2 className="text-l font-medium">  // 20px
-<p className="text-m">               // 16px
-<span className="text-s">            // 14px
-<small className="text-xs">          // 12px
-```
-
-## 🎯 Key Features Implementation
-
-### Cart System
-
-- **Persistent Storage**: Uses cookies for server-side access
-- **Complex Options**: Handles radio groups, checkboxes, and quantity selectors
-- **Price Calculation**: Automatic price updates based on selections
-- **Multi-Store Support**: Organizes items by restaurant
-
-### Authentication
-
-- **Role-Based**: Separate customer and store owner accounts
-- **Session Management**: Secure HTTP-only cookies
-- **Form Validation**: Comprehensive validation with error handling
-- **Simplified Flow**: Minimal registration (email, password, role only)
-
-### Design System
-
-- **Tailwind v4**: Modern CSS with native variables
-- **Component Library**: shadcn/ui with custom styling
-- **Accessibility**: ARIA attributes and keyboard navigation
-- **Responsive**: Mobile-first design approach
-
-## 📚 Documentation
-
-- **[Ticket Store Guide](TICKET_STORE_GUIDE.md)** - Complete cart system documentation
-- **[Design System](DESIGN_SYSTEM.md)** - Design tokens and component usage
-- **[Authentication](AUTH_IMPLEMENTATION.md)** - Auth system implementation
-- **[Migration Summary](MIGRATION_SUMMARY.md)** - Component migration details
-- **[Role Updates](ROLE_UPDATE_SUMMARY.md)** - Role system changes
-- **[Avatar Removal](AVATAR_REMOVAL_SUMMARY.md)** - Simplified registration flow
-
-## 🔧 Configuration
-
-### Environment Variables
-
-```bash
-# Optional - defaults to /api for Next.js routes
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
-```
-
-### Tailwind Configuration
-
-The project uses Tailwind CSS v4 with custom design tokens defined in `globals.css`:
+### Tokens CSS (globals.css)
 
 ```css
-@theme {
-  --color-primary: #7b1fa2;
-  --color-teal: #00a296;
-  --color-success: #02a117;
-  --spacing-s: 12px;
-  --spacing-m: 16px;
-  --spacing-l: 24px;
-  /* ... more tokens */
+:root {
+  --bg-primary: #...;
+  --text-primary: #...;
+  /* ... outros tokens */
 }
 ```
 
-## 🚀 Deployment
+## 🔐 Autenticação e Roteamento
 
-### Build for Production
+O aplicativo utiliza um sistema de autenticação baseado em cookies com middleware do Next.js:
+
+- **Rotas Públicas**: `/login`, `/register`, `/landing`
+- **Rotas Privadas**: Todas as outras rotas requerem autenticação
+- **Redirecionamento**: Usuários não autenticados são redirecionados para `/login`
+- **Fluxo de Localização**: Usuários autenticados devem definir localização antes de acessar as lojas
+
+## 📱 Funcionalidades Principais
+
+### 1. Autenticação
+
+- Sistema de login/registro
+- Proteção de rotas via middleware
+- Persistência de sessão com cookies
+
+### 2. Localização
+
+- Definição obrigatória de localização
+- Filtro de lojas por região
+
+### 3. Navegação de Lojas
+
+- Listagem de restaurantes disponíveis
+- Filtros e busca
+- Informações detalhadas de cada loja
+
+### 4. Catálogo de Produtos
+
+- Produtos organizados por categoria
+- Imagens, preços e descrições
+- Sistema de avaliações
+
+### 5. Carrinho (Ticket)
+
+- Adição/remoção de itens
+- Controle de quantidade
+- Persistência entre sessões
+- Cálculo automático de totais
+
+### 6. Checkout
+
+- Processo de finalização de pedido
+- Integração com API de pagamento
+- Confirmação de pedido
+
+### 7. Acompanhamento
+
+- Status de entrega em tempo real
+- Notificações de progresso
+
+## 🚀 Como Executar
+
+1. **Instalar dependências:**
+
+   ```bash
+   npm install
+   ```
+
+2. **Executar em desenvolvimento:**
+
+   ```bash
+   npm run dev
+   ```
+
+3. **Executar Storybook:**
+
+   ```bash
+   npm run storybook
+   ```
+
+4. **Build para produção:**
+
+   ```bash
+   npm run build
+   npm start
+   ```
+
+5. **Verificar tipos:**
 
 ```bash
-npm run build
-npm run start
+   npm run typecheck
 ```
 
-### Deploy on Vercel
+## 🧪 Desenvolvimento
 
-The easiest way to deploy is using the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme).
+### Scripts Disponíveis
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` - Inicia o servidor de desenvolvimento
+- `npm run build` - Gera build de produção
+- `npm run start` - Inicia servidor de produção
+- `npm run lint` - Executa linting
+- `npm run typecheck` - Verifica tipos TypeScript
+- `npm run storybook` - Inicia Storybook
+- `npm run build-storybook` - Gera build do Storybook
 
-## 🤝 Contributing
+### Estrutura de Componentes
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Cada componente segue a estrutura:
 
-## 📝 License
+```
+ComponentName/
+├── index.tsx           # Exportação principal
+├── Component-name.tsx   # Implementação
+├── Component-name.stories.tsx  # Stories do Storybook
+└── Component-name.module.css   # Estilos específicos (se necessário)
+```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 🏗️ Arquitetura
 
-## 🙏 Acknowledgments
+### Estado Global (Zustand)
 
-- [Next.js](https://nextjs.org/) - React framework
-- [shadcn/ui](https://ui.shadcn.com/) - Component library
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-- [Zustand](https://github.com/pmndrs/zustand) - State management
-- [Lucide](https://lucide.dev/) - Icon library
+- **dish-store**: Gerencia produtos/pratos selecionados
+- **ticket-store**: Gerencia carrinho de compras
+- **search-store**: Gerencia estado da busca
+
+### API Routes
+
+- Estrutura RESTful com endpoints para todas as funcionalidades
+- Validação com Zod
+- Tratamento de erros consistente
+
+### Middleware
+
+- Proteção de rotas
+- Redirecionamento baseado em autenticação
+- Validação de tokens
+
+### Componentes
+
+- Design system baseado em Radix UI
+- Componentes reutilizáveis e modulares
+- Documentação via Storybook
+
+## 🌟 Características Técnicas
+
+- **Performance**: Server Components por padrão, Client Components apenas quando necessário
+- **SEO**: Otimização para mecanismos de busca
+- **Acessibilidade**: Componentes acessíveis via Radix UI
+- **Type Safety**: TypeScript em todo o projeto
+- **Responsividade**: Design mobile-first
+
+## 🔧 Configuração
+
+### Variáveis de Ambiente
+
+```env
+# Adicione suas variáveis de ambiente aqui
+NEXT_PUBLIC_API_URL=...
+```
+
+### Tailwind CSS
+
+Configurado para usar tokens CSS customizados definidos em `globals.css`, proporcionando máxima flexibilidade e manutenibilidade.
 
 ---
 
-Made with ❤️ for the food delivery community
+**Desenvolvido com ❤️**

@@ -8,13 +8,9 @@ export default function FavoriteButton({ storeSlug }: { storeSlug: string }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
-    try {
-      const storedFavorites = localStorage.getItem("favorites") || "[]";
-      const favorites = JSON.parse(storedFavorites);
-      setIsFavorite(favorites.includes(storeSlug));
-    } catch (error) {
-      console.error("Error carregando favoritos:", error);
-    }
+    const storedFavorites = localStorage.getItem("favorites") || "[]";
+    const favorites = JSON.parse(storedFavorites);
+    setIsFavorite(favorites.includes(storeSlug));
   }, [storeSlug]);
 
   const handleSaveFavorite = () => {
@@ -36,7 +32,6 @@ export default function FavoriteButton({ storeSlug }: { storeSlug: string }) {
       setIsFavorite(false);
     } catch (error) {
       toast.error("Erro ao salvar favorito");
-      console.error("Erro ao salvar favorito:", error);
     }
   };
 

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TicketItem } from "@/types/ticket";
-import { formatPrice } from "@/stores/ticket-utils";
 import { createTicket } from "@/services/checkout";
 import { toast } from "sonner";
 import CheckoutTicket from "./checkout-ticket";
@@ -12,6 +11,7 @@ import { clearTicketFromCookies } from "@/lib/cookies";
 import { useTicketStore } from "@/stores/ticket-store";
 import { useDishStore } from "@/stores/dish-store";
 import Image from "next/image";
+import { formatPrice } from "@/stores/ticket-utils";
 
 interface CheckoutContentProps {
   ticketItem: TicketItem;

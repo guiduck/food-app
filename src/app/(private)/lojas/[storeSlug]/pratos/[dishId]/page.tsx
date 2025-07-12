@@ -20,7 +20,6 @@ export default async function TicketPage({ params }: TicketPageProps) {
   if (dishResult.error || !dishResult.data) {
     notFound();
   }
-
   const dish = dishResult.data;
 
   return (

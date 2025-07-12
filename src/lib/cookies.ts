@@ -7,7 +7,7 @@ export function saveTicketToCookies(items: TicketItem, ctx?: any) {
   const ticketData = JSON.stringify(items);
 
   setCookie(ctx, COOKIE_KEY, ticketData, {
-    maxAge: 30 * 24 * 60 * 60, // 30d
+    maxAge: 30 * 24 * 60 * 60,
     path: "/",
   });
 }

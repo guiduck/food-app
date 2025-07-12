@@ -1,27 +1,41 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { TicketItem } from "@/types/ticket";
+import { parseCookies, setCookie } from "nookies";
 
 const COOKIE_KEY = "aiqfome-ticket-data";
 
 const ticketStorage = new Map<string, TicketItem>();
 
-async function getTicketFromCookiesServer(): Promise<TicketItem | null> {
+async function getTicketFromCookiesServer(
+  request?: Request
+): Promise<TicketItem | null> {
   try {
-    const cookieStore = await cookies();
-    const ticketData = cookieStore.get(COOKIE_KEY)?.value;
+    const cookiesData = parseCookies({ req: request as any });
+    const ticketData = cookiesData[COOKIE_KEY];
 
-    if (!ticketData) {
+    if (ticketData) {
+      const parsed = JSON.parse(ticketData);
+      if (parsed.addedAt) {
+        parsed.addedAt = new Date(parsed.addedAt);
+      }
+      return parsed;
+    }
+
+    const cookieStore = await cookies();
+    const nextTicketData = cookieStore.get(COOKIE_KEY)?.value;
+
+    if (!nextTicketData) {
       return null;
     }
 
-    const parsed = JSON.parse(ticketData);
+    const parsed = JSON.parse(nextTicketData);
     if (parsed.addedAt) {
       parsed.addedAt = new Date(parsed.addedAt);
     }
     return parsed;
   } catch (error) {
-    console.error("Error parsing ticket data from cookies:", error);
+    console.error("Error getting ticket from cookies:", error);
     return null;
   }
 }
@@ -55,17 +69,22 @@ export async function POST(request: Request) {
       0
     );
 
-    const ticketId = `TICKET_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 9)
-      .toUpperCase()}`;
+    const ticketId =
+      ticketData.id ||
+      `TICKET_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)
+        .toUpperCase()}`;
 
     const completeTicket: TicketItem = {
       ...ticketData,
       id: ticketId,
+      addedAt: new Date(),
     };
 
     ticketStorage.set(ticketId, completeTicket);
+
+    const ticketDataString = JSON.stringify(completeTicket);
 
     const response = NextResponse.json(
       {
@@ -77,7 +96,7 @@ export async function POST(request: Request) {
           estimatedDeliveryTime: "30-45 min",
           totalItems,
           totalPrice: ticketData.totalPrice,
-          createdAt: new Date().toISOString(),
+          createdAt: completeTicket.addedAt.toISOString(),
           store: ticketData.store,
           dishes: ticketData.dishes,
         },
@@ -85,19 +104,26 @@ export async function POST(request: Request) {
       { status: 201 }
     );
 
-    const ticketDataString = JSON.stringify(completeTicket);
-    response.cookies.set(COOKIE_KEY, ticketDataString, {
-      maxAge: 30 * 24 * 60 * 60, // 30 days
-      path: "/",
-      httpOnly: false,
-      secure: false,
-      sameSite: "lax",
-    });
+    try {
+      setCookie({ res: response as any }, COOKIE_KEY, ticketDataString, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: "/",
+        httpOnly: false,
+        secure: false,
+        sameSite: "lax",
+      });
+    } catch (error) {
+      response.cookies.set(COOKIE_KEY, ticketDataString, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: "/",
+        httpOnly: false,
+        secure: false,
+        sameSite: "lax",
+      });
+    }
 
     return response;
   } catch (error) {
-    console.error("Erro ao criar pedido:", error);
-
     return NextResponse.json(
       {
         error: "Erro interno do servidor",
@@ -122,26 +148,26 @@ export async function GET(request: Request) {
 
     let ticketFromStorage = ticketStorage.get(ticketId);
 
-    if (!ticketFromStorage) {
-      const cookieTicket = await getTicketFromCookiesServer();
-      console.log("cookieTicket", cookieTicket);
-      if (cookieTicket) {
-        ticketFromStorage = cookieTicket;
+    if (ticketFromStorage) {
+    } else {
+      const cookieTicket = await getTicketFromCookiesServer(request);
+
+      if (!cookieTicket) {
+        return NextResponse.json(
+          { error: "Ticket não encontrado" },
+          { status: 404 }
+        );
       }
-    }
 
-    if (!ticketFromStorage) {
-      return NextResponse.json(
-        { error: "Ticket não encontrado" },
-        { status: 404 }
-      );
-    }
+      if (cookieTicket.id !== ticketId) {
+        return NextResponse.json(
+          { error: "Ticket não encontrado" },
+          { status: 404 }
+        );
+      }
 
-    if (!ticketStorage.has(ticketId) && ticketFromStorage.id !== ticketId) {
-      return NextResponse.json(
-        { error: "Ticket não encontrado" },
-        { status: 404 }
-      );
+      ticketFromStorage = cookieTicket;
+      ticketStorage.set(ticketId, cookieTicket);
     }
 
     const response = {
@@ -166,8 +192,6 @@ export async function GET(request: Request) {
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error("Erro ao buscar pedido:", error);
-
     return NextResponse.json(
       {
         error: "Erro interno do servidor",
