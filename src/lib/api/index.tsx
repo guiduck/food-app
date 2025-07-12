@@ -24,6 +24,10 @@ function getBaseUrl() {
     return `https://${process.env.VERCEL_URL}`;
   }
 
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL;
+  }
+
   return "http://localhost:3000";
 }
 
@@ -32,6 +36,16 @@ export default async function API<T = any>(
 ): Promise<APIResponse<T>> {
   const baseUrl = getBaseUrl();
   const fullUrl = `${baseUrl}/api/${request.url}`;
+
+  if (process.env.NODE_ENV === "production") {
+    console.log("API Debug:", {
+      baseUrl,
+      fullUrl,
+      vercelUrl: process.env.VERCEL_URL,
+      siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
+      isClient: typeof window !== "undefined",
+    });
+  }
 
   const isFormData = request.data instanceof FormData;
 
@@ -68,6 +82,14 @@ export default async function API<T = any>(
       headers: response.headers,
     };
   } catch (error) {
+    if (process.env.NODE_ENV === "production") {
+      console.error("API Error:", {
+        url: fullUrl,
+        error: error,
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+
     return {
       status: 500,
       data: null,
