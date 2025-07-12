@@ -1,14 +1,41 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { FavIcon, AvatarIcon } from "@/components/Icon";
 import { HeaderProps } from "./types";
 import AddressLine from "./address-line";
 import Link from "next/link";
+import { LocationData } from "@/types/location";
 
 export const Header: React.FC<HeaderProps> = ({
-  address = "Rua Mandaguari, 198",
+  address: propAddress,
   addressLine2 = "entregando em",
   className = "",
 }) => {
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    try {
+      const locationCookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("user_location="));
+
+      if (locationCookie) {
+        const locationValue = locationCookie.split("=")[1];
+        const decodedValue = decodeURIComponent(locationValue);
+        const location = JSON.parse(decodedValue) as LocationData;
+        setUserLocation(location);
+      }
+    } catch (error) {
+      console.error("Error reading location cookie:", error);
+    }
+  }, []);
+
+  const displayAddress =
+    propAddress || userLocation?.address || "Rua Mandaguari, 198";
+
   return (
     <header
       className={`bg-primary dark:bg-primary-dark text-primary-foreground ${className}`}
@@ -24,7 +51,7 @@ export const Header: React.FC<HeaderProps> = ({
           <AddressLine
             href="/localizacao"
             addressLine2={addressLine2}
-            address={address}
+            address={displayAddress}
           />
         </div>
 

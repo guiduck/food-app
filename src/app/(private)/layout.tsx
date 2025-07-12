@@ -1,19 +1,13 @@
 import { Header } from "@/components/Header";
-import { getLocationFromCookies } from "@/actions/location";
 
-export default async function PrivateLayout({
+export default function PrivateLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const userLocation = await getLocationFromCookies();
-
   return (
     <div className="flex flex-col min-h-screen">
-      <Header
-        address={userLocation?.address || "Rua Mandaguari, 198"}
-        addressLine2="entregando em"
-      />
+      <Header />
       <main className="flex-grow pb-20">{children}</main>
     </div>
   );

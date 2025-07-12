@@ -4,8 +4,6 @@ import { getStores, addOpenStatusToStores } from "@/services/stores";
 import StoreList from "./ui/store-list";
 import HomeSearchBar from "./ui/search-bar";
 
-export const dynamic = "force-dynamic";
-
 export default async function HomePage() {
   const [bannersResult, storesResult] = await Promise.all([
     getBanners(),

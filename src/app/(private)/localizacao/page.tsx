@@ -1,8 +1,6 @@
 import nextDynamic from "next/dynamic";
 import { LocationForm } from "./ui/form-location";
 
-export const dynamic = "force-dynamic";
-
 const ThemeToggle = nextDynamic(() => import("@/components/ui/theme-toggle"), {
   ssr: true,
 });
