@@ -124,14 +124,46 @@ export default async function API<T = any>(
     const responseData = await response.json();
 
     if (!response.ok) {
-      console.error("❌ API Response Error:", {
+      const errorDetails = {
         timestamp: new Date().toISOString(),
         status: response.status,
         statusText: response.statusText,
         url: fullUrl,
         responseData,
         headers: Object.fromEntries(response.headers.entries()),
-      });
+        requestMethod: request.method,
+        requestData: request.data,
+        baseUrl,
+        environment: process.env.NODE_ENV,
+        vercelUrl: process.env.VERCEL_URL,
+        isClient: typeof window !== "undefined",
+      };
+
+      console.error("❌ API Response Error:", errorDetails);
+
+      // Send to error logging endpoint in production (client-side only)
+      if (
+        process.env.NODE_ENV === "production" &&
+        typeof window !== "undefined"
+      ) {
+        try {
+          fetch("/api/log-error", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              type: "API_RESPONSE_ERROR",
+              ...errorDetails,
+            }),
+          }).catch((logError) => {
+            console.error(
+              "Failed to send error to logging endpoint:",
+              logError
+            );
+          });
+        } catch (logError) {
+          console.error("Failed to send error to logging endpoint:", logError);
+        }
+      }
 
       return {
         status: response.status,
@@ -159,7 +191,7 @@ export default async function API<T = any>(
       headers: response.headers,
     };
   } catch (error) {
-    console.error("💥 API Fetch Error:", {
+    const errorDetails = {
       timestamp: new Date().toISOString(),
       url: fullUrl,
       error: error,
@@ -167,7 +199,36 @@ export default async function API<T = any>(
       stack: error instanceof Error ? error.stack : undefined,
       name: error instanceof Error ? error.name : "Unknown",
       cause: error instanceof Error ? error.cause : undefined,
-    });
+      requestMethod: request.method,
+      requestData: request.data,
+      baseUrl,
+      environment: process.env.NODE_ENV,
+      vercelUrl: process.env.VERCEL_URL,
+      isClient: typeof window !== "undefined",
+    };
+
+    console.error("💥 API Fetch Error:", errorDetails);
+
+    // Send to error logging endpoint in production (client-side only)
+    if (
+      process.env.NODE_ENV === "production" &&
+      typeof window !== "undefined"
+    ) {
+      try {
+        fetch("/api/log-error", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "API_FETCH_ERROR",
+            ...errorDetails,
+          }),
+        }).catch((logError) => {
+          console.error("Failed to send error to logging endpoint:", logError);
+        });
+      } catch (logError) {
+        console.error("Failed to send error to logging endpoint:", logError);
+      }
+    }
 
     return {
       status: 500,
