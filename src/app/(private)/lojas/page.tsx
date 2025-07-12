@@ -39,7 +39,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        <section className="pb-l">
+        <section className="pb-l px-m">
           <StoreList stores={storesWithStatus} />
         </section>
       </div>

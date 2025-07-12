@@ -6,6 +6,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Metadata } from "next";
 import SearchBar from "@/components/SearchBar";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Design system | aiqfome",
   description:

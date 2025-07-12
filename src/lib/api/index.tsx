@@ -15,7 +15,15 @@ export interface APIResponse<T> {
   headers?: Headers | null;
 }
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL!;
+const getBaseUrl = () => {
+  if (process.env.NODE_ENV === "development") {
+    return process.env.NEXT_PUBLIC_API_BASE_URL!;
+  }
+
+  return process.env.VERCEL_URL;
+};
+
+const BASE_URL = getBaseUrl();
 
 export default async function API<T = any>(
   request: APIRequest
