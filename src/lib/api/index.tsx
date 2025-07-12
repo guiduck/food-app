@@ -15,20 +15,23 @@ export interface APIResponse<T> {
   headers?: Headers | null;
 }
 
-const getBaseUrl = () => {
-  if (process.env.NODE_ENV === "development") {
-    return process.env.NEXT_PUBLIC_API_BASE_URL!;
+function getBaseUrl() {
+  if (typeof window !== "undefined") {
+    return "";
   }
 
-  return process.env.VERCEL_URL;
-};
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
 
-const BASE_URL = getBaseUrl();
+  return "http://localhost:3000";
+}
 
 export default async function API<T = any>(
   request: APIRequest
 ): Promise<APIResponse<T>> {
-  const fullUrl = `${BASE_URL}/${request.url}`;
+  const baseUrl = getBaseUrl();
+  const fullUrl = `${baseUrl}/api/${request.url}`;
 
   const isFormData = request.data instanceof FormData;
 
