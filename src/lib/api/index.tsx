@@ -16,10 +16,13 @@ export interface APIResponse<T> {
 }
 
 function getBaseUrl() {
+  // Client-side: use relative URLs
   if (typeof window !== "undefined") {
     return "";
   }
 
+  // Server-side: construct absolute URL
+  // Priority order: VERCEL_URL -> NEXT_PUBLIC_SITE_URL -> localhost
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
   }
@@ -28,7 +31,53 @@ function getBaseUrl() {
     return process.env.NEXT_PUBLIC_SITE_URL;
   }
 
+  // Development fallback
   return "http://localhost:3000";
+}
+
+async function tryFetchWithFallback(
+  url: string,
+  options: RequestInit
+): Promise<Response> {
+  try {
+    // First attempt: standard fetch
+    const response = await fetch(url, options);
+    return response;
+  } catch (error) {
+    console.warn("🔄 First fetch attempt failed, trying fallback...", {
+      url,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+
+    // Fallback: try with localhost if we're on server side and have VERCEL_URL
+    if (
+      typeof window === "undefined" &&
+      process.env.VERCEL_URL &&
+      url.includes(process.env.VERCEL_URL)
+    ) {
+      const fallbackUrl = url.replace(
+        `https://${process.env.VERCEL_URL}`,
+        "http://localhost:3000"
+      );
+      console.log("🔄 Trying fallback URL:", fallbackUrl);
+
+      try {
+        const fallbackResponse = await fetch(fallbackUrl, options);
+        return fallbackResponse;
+      } catch (fallbackError) {
+        console.error("❌ Fallback also failed:", {
+          fallbackUrl,
+          error:
+            fallbackError instanceof Error
+              ? fallbackError.message
+              : "Unknown error",
+        });
+        throw error; // Throw original error
+      }
+    }
+
+    throw error;
+  }
 }
 
 export default async function API<T = any>(
@@ -37,22 +86,30 @@ export default async function API<T = any>(
   const baseUrl = getBaseUrl();
   const fullUrl = `${baseUrl}/api/${request.url}`;
 
-  if (process.env.NODE_ENV === "production") {
-    console.log("API Request Debug:", {
+  // Always log in production, and in development for debugging
+  if (
+    process.env.NODE_ENV === "production" ||
+    process.env.NODE_ENV === "development"
+  ) {
+    console.log("🔍 API Request Debug:", {
+      timestamp: new Date().toISOString(),
       baseUrl,
       fullUrl,
+      requestUrl: request.url,
+      method: request.method,
+      environment: process.env.NODE_ENV,
       vercelUrl: process.env.VERCEL_URL,
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL,
       isClient: typeof window !== "undefined",
-      requestUrl: request.url,
-      method: request.method,
+      hasData: !!request.data,
+      dataType: request.data ? typeof request.data : "none",
     });
   }
 
   const isFormData = request.data instanceof FormData;
 
   try {
-    const response = await fetch(fullUrl, {
+    const response = await tryFetchWithFallback(fullUrl, {
       method: request.method,
       next: request.next,
       headers: {
@@ -67,14 +124,14 @@ export default async function API<T = any>(
     const responseData = await response.json();
 
     if (!response.ok) {
-      if (process.env.NODE_ENV === "production") {
-        console.error("API Response Error:", {
-          status: response.status,
-          statusText: response.statusText,
-          url: fullUrl,
-          responseData,
-        });
-      }
+      console.error("❌ API Response Error:", {
+        timestamp: new Date().toISOString(),
+        status: response.status,
+        statusText: response.statusText,
+        url: fullUrl,
+        responseData,
+        headers: Object.fromEntries(response.headers.entries()),
+      });
 
       return {
         status: response.status,
@@ -85,6 +142,15 @@ export default async function API<T = any>(
       };
     }
 
+    if (process.env.NODE_ENV === "production") {
+      console.log("✅ API Success:", {
+        timestamp: new Date().toISOString(),
+        status: response.status,
+        url: fullUrl,
+        dataReceived: !!responseData,
+      });
+    }
+
     return {
       status: response.status,
       data: responseData,
@@ -93,14 +159,15 @@ export default async function API<T = any>(
       headers: response.headers,
     };
   } catch (error) {
-    if (process.env.NODE_ENV === "production") {
-      console.error("API Fetch Error:", {
-        url: fullUrl,
-        error: error,
-        message: error instanceof Error ? error.message : "Unknown error",
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-    }
+    console.error("💥 API Fetch Error:", {
+      timestamp: new Date().toISOString(),
+      url: fullUrl,
+      error: error,
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : "Unknown",
+      cause: error instanceof Error ? error.cause : undefined,
+    });
 
     return {
       status: 500,
@@ -108,7 +175,11 @@ export default async function API<T = any>(
       error: true,
       errorUserMessage: "Erro no servidor.",
       headers: null,
-      debug: error,
+      debug: {
+        error: error instanceof Error ? error.message : "Unknown error",
+        type: "FETCH_ERROR",
+        url: fullUrl,
+      },
     };
   }
 }
