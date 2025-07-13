@@ -381,7 +381,7 @@ export default function TicketForm({ dish }: TicketFormProps) {
         ))}
       </div>
 
-      <div className="bg-card pt-[26px] px-[28px] rounded-m">
+      <div className="bg-card pt-[26px] px-m rounded-m">
         <textarea
           value={currentDish?.notes ?? ""}
           onChange={(e) => handleNotesChange(e.target.value)}
